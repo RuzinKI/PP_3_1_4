@@ -19,13 +19,11 @@ public class AdminController {
 
     private final UserService userService;
     private final RoleService roleService;
-    private final PasswordEncoder passwordEncoder;
 
 
-    public AdminController(UserService userService, RoleService roleService, PasswordEncoder passwordEncoder) {
+    public AdminController(UserService userService, RoleService roleService) {
         this.userService = userService;
         this.roleService = roleService;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/users")
@@ -33,16 +31,12 @@ public class AdminController {
         model.addAttribute("currentUser", user);
         model.addAttribute("users", userService.getAll());
         model.addAttribute("newUser", new User());
-
-        List<Role> roles = roleService.getAll();
-        model.addAttribute("allRoles", roles);
+        model.addAttribute("allRoles", roleService.getAll());
         return "admin";
     }
 
     @PostMapping ("/save")
     public String saveUser(@ModelAttribute("user") User user) {
-        System.out.println("save user");
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.add(user);
         return "redirect:/admin/users";
     }
@@ -50,7 +44,6 @@ public class AdminController {
     @PatchMapping("/edit/{id}")
     public String editUserPost(@PathVariable Long id,
                                @ModelAttribute("user") User user) {
-        user.setId(id);
         userService.update(id, user);
         return "redirect:/admin/users";
     }
