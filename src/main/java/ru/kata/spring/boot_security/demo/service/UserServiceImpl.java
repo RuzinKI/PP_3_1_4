@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
-public class UserServiceImpl implements UserDetailsService, UserService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -46,12 +46,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     @Override
     @Transactional
     public void delete(Long id) {
-        userRepository.findById(id)
-                .map(user -> {
-                    userRepository.delete(user);
-                    userRepository.flush();
-                    return true;
-                }).orElse(false);
+        userRepository.deleteById(id);
     }
 
     @Override
@@ -71,10 +66,4 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         return userRepository.findByEmail(name).get();
     }
 
-    @Override
-    public User loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByEmail(username);
-        user.get().getRoles().size();
-        return user.orElseThrow(() -> new UsernameNotFoundException("Failed to retrieve user: "+username));
-    }
 }
